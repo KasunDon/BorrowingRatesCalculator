@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd"
+       default-lazy-init="true">
+
+    <!-- domain -->
+
+    <bean id="applicationExecutor"
+          class="com.zopa.borrowingratescalculator.domain.ApplicationExecutor"
+          autowire="constructor">
+        <constructor-arg name="inputDataValidator" ref="compositeCommandLineInputDataValidator"/>
+    </bean>
+
+    <bean id="interestRatesFinder"
+          class="com.zopa.borrowingratescalculator.domain.InterestRatesFinder"
+          autowire="constructor">
+    </bean>
+
+    <!-- domain.compute -->
+
+    <bean id="compoundInterestCalculator"
+          class="com.zopa.borrowingratescalculator.domain.compute.CompoundInterestCalculator"
+          autowire="constructor">
+    </bean>
+
+    <bean id="loanQuotesGenerator"
+          class="com.zopa.borrowingratescalculator.domain.compute.LoanQuotesGenerator"
+          autowire="constructor">
+    </bean>
+
+    <bean id="interestRateComputeRuleExecutor"
+          class="com.zopa.borrowingratescalculator.domain.compute.InterestRateComputeRuleExecutor"
+          autowire="constructor">
+        <constructor-arg>
+            <list>
+                <ref bean="totalBalanceComputeRule" />
+                <ref bean="lenderWithLowInterestRateComputeRule" />
+                <ref bean="splittedInterestRateComputeRule" />
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- domain.compute.rule -->
+
+    <bean id="totalBalanceComputeRule"
+          class="com.zopa.borrowingratescalculator.domain.compute.rule.TotalBalanceComputeRule"
+          autowire="constructor">
+    </bean>
+
+    <bean id="lenderWithLowInterestRateComputeRule"
+          class="com.zopa.borrowingratescalculator.domain.compute.rule.LenderWithLowInterestRateComputeRule"
+          autowire="constructor">
+    </bean>
+
+    <bean id="splittedInterestRateComputeRule"
+          class="com.zopa.borrowingratescalculator.domain.compute.rule.SplittedInterestRateComputeRule"
+          autowire="constructor">
+    </bean>
+
+    <!-- domain.formatter -->
+
+    <bean id="commandLineOutputFormatter"
+          class="com.zopa.borrowingratescalculator.domain.formatter.CommandLineOutputFormatter"
+          autowire="constructor">
+    </bean>
+
+    <!-- domain.mapper -->
+
+    <bean id="lenderMarketDataMapper"
+          class="com.zopa.borrowingratescalculator.domain.mapper.LenderMarketDataMapper"
+          autowire="constructor">
+    </bean>
+
+    <!-- domain.validator -->
+
+    <!-- command-line validators -->
+
+    <bean id="commandLineFileLocationInputDataValidation"
+          class="com.zopa.borrowingratescalculator.domain.validator.cli.CommandLineFileLocationInputDataValidation"
+          autowire="constructor">
+    </bean>
+
+    <bean id="commandLineLoanAmountInputDataValidation"
+          class="com.zopa.borrowingratescalculator.domain.validator.cli.CommandLineLoanAmountInputDataValidation"
+          autowire="constructor">
+    </bean>
+
+    <bean id="compositeCommandLineInputDataValidator"
+          class="com.zopa.borrowingratescalculator.domain.validator.CompositeInputDataValidator"
+          autowire="constructor">
+        <constructor-arg>
+            <list>
+                <ref bean="commandLineFileLocationInputDataValidation"/>
+                <ref bean="commandLineLoanAmountInputDataValidation"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- csv validators -->
+
+    <bean id="csvLenderNameInputDataValidator"
+          class="com.zopa.borrowingratescalculator.domain.validator.csv.CsvLenderNameInputDataValidator"
+          autowire="constructor">
+    </bean>
+
+    <bean id="csvLenderRateInputDataValidator"
+          class="com.zopa.borrowingratescalculator.domain.validator.csv.CsvLenderRateInputDataValidator"
+          autowire="constructor">
+    </bean>
+
+    <bean id="csvLenderBalanceInputDataValidator"
+          class="com.zopa.borrowingratescalculator.domain.validator.csv.CsvLenderBalanceInputDataValidator"
+          autowire="constructor">
+    </bean>
+
+    <bean id="compositeCsvInputDataValidator"
+          class="com.zopa.borrowingratescalculator.domain.validator.CompositeInputDataValidator"
+          autowire="constructor">
+        <constructor-arg>
+            <list>
+                <ref bean="csvLenderNameInputDataValidator"/>
+                <ref bean="csvLenderRateInputDataValidator"/>
+                <ref bean="csvLenderBalanceInputDataValidator"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- infrastructure -->
+
+    <!-- infrastructure.csv -->
+
+    <bean id="lenderMarketDataLoaderFactory"
+          class="com.zopa.borrowingratescalculator.infrastructure.csv.LenderMarketDataLoaderFactory"
+          autowire="constructor">
+    </bean>
+
+    <!-- infrastructure.csv.opencsv -->
+
+    <bean id="openCSVReaderFactory"
+          class="com.zopa.borrowingratescalculator.infrastructure.csv.opencsv.OpenCSVReaderFactory">
+    </bean>
+
+    <bean id="openCsvLenderMarketDataFileReader"
+          class="com.zopa.borrowingratescalculator.infrastructure.csv.opencsv.OpenCsvLenderMarketDataFileReader"
+          autowire="constructor">
+        <constructor-arg name="inputDataValidator" ref="compositeCsvInputDataValidator" />
+    </bean>
+
+</beans>
